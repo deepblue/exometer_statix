@@ -2,7 +2,6 @@ defmodule ExometerStatix do
   @moduledoc """
   Documentation for ExometerStatix.
   """
-  require Logger
   alias ExometerStatix.Client
 
   @type_map [
@@ -19,8 +18,6 @@ defmodule ExometerStatix do
 
   # @spec exometer_init(term) :: {:ok, nil} | {:error, binary}
   def exometer_init(opts) do
-    Logger.debug("[ExometerStatix] init #{inspect(opts)}")
-
     init_statix(opts)
 
     case Client.connect() do
@@ -35,7 +32,6 @@ defmodule ExometerStatix do
     name = Enum.join(key, ".")
     type = report_type(key, type_map)
 
-    Logger.debug("[ExometerStatix] report #{type} #{name} #{value}")
     report(type, name, value)
     {:ok, state}
   end
@@ -84,7 +80,7 @@ defmodule ExometerStatix do
     Application.put_env(:statix, Client,
       host: Keyword.get(opts, :host, @host),
       port: Keyword.get(opts, :port, @port),
-      prefix: Keyword.get(opts, :prefix, @prefix),
+      prefix: prefix(Keyword.get(opts, :prefix, @prefix)),
     )
   end
 
@@ -107,4 +103,7 @@ defmodule ExometerStatix do
   defp report(:timer, n, v), do: Client.timing(n, v)
   defp report(:counter, n, v), do: Client.increment(n, v)
   defp report(:histogram, n, v), do: Client.histogram(n, v)
+
+  defp prefix(v) when is_atom(v), do: Atom.to_string(v)
+  defp prefix(v), do: v
 end
