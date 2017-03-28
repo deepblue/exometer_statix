@@ -40,7 +40,7 @@ defmodule ExometerStatix.Mixfile do
   defp deps do
     [
       {:statix, "~> 1.0"},
-      {:ex_doc, "~> 0.14", only: :docs},
+      {:ex_doc, "~> 0.14", only: :dev},
     ]
   end
 end
