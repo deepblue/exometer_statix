@@ -104,6 +104,7 @@ defmodule ExometerStatix do
   defp report(:counter, n, v), do: Client.increment(n, v)
   defp report(:histogram, n, v), do: Client.histogram(n, v)
 
+  defp prefix(nil), do: nil
   defp prefix(v) when is_atom(v), do: Atom.to_string(v)
   defp prefix(v), do: v
 end
