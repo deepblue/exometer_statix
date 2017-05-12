@@ -5,7 +5,7 @@ defmodule ExometerStatix.Mixfile do
   StatsD reporter backend for exometer_core
   """
   @project_url "https://github.com/deepblue/exometer_statix"
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [app: :exometer_statix,
