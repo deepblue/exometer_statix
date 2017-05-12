@@ -80,7 +80,7 @@ defmodule ExometerStatix do
     Application.put_env(:statix, Client,
       host: Keyword.get(opts, :host, @host),
       port: Keyword.get(opts, :port, @port),
-      prefix: prefix(Keyword.get(opts, :prefix, @prefix)),
+      prefix: ensure_string(Keyword.get(opts, :prefix, @prefix)),
     )
   end
 
@@ -93,18 +93,19 @@ defmodule ExometerStatix do
   end
 
   defp report_type(key, type_map) do
-    case Enum.find(key, fn(k) -> type_map[Atom.to_string(k)] end) do
+    case Enum.find(key, fn(k) -> type_map[ensure_string(k)] end) do
       nil -> @defalut_type
-      t -> type_map[Atom.to_string(t)]
+      t -> type_map[ensure_string(t)]
     end
   end
 
   defp report(:gauge, n, v), do: Client.gauge(n, v)
   defp report(:timer, n, v), do: Client.timing(n, v)
-  defp report(:counter, n, v), do: Client.increment(n, v)
+  defp report(:counter, n, v) when is_number(v) and v != 0, do: Client.increment(n, v)
   defp report(:histogram, n, v), do: Client.histogram(n, v)
+  defp report(_, _, _), do: nil
 
-  defp prefix(nil), do: nil
-  defp prefix(v) when is_atom(v), do: Atom.to_string(v)
-  defp prefix(v), do: v
+  def ensure_string(nil), do: nil
+  def ensure_string(k) when is_atom(k), do: Atom.to_string(k)
+  def ensure_string(k), do: k
 end
